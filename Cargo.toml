@@ -1,6 +1,0 @@
-[workspace]
-members = [
-    "ra-common",
-    "ra-enclave",
-    "ra-sp",
-]
