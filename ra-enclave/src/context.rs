@@ -46,7 +46,7 @@ impl EnclaveRaContext {
         // Verify QE report
         let qe_report = Report::try_copy_from(&qe_report_bytes)
             .ok_or_else(|| EnclaveRaContextError::InvalidQeReport)?;
-        verify_report(&qe_report)?;
+        verify_qe_report(&qe_report, &target_info)?;
 
         // Get attestation report from SP server
         self.sp_ra_client
@@ -62,6 +62,22 @@ impl EnclaveRaContext {
 
         Report::for_target(target_info, &report_data)
     }
+}
+
+/// Verifies QE report
+pub fn verify_qe_report(
+    report: &Report,
+    target_info: &Targetinfo,
+) -> Result<(), EnclaveRaContextError> {
+    // Check if the QE report is valid
+    verify_report(report)?;
+
+    // Check if the qe_report is produced on the same platform
+    if target_info.measurement != report.mrenclave || target_info.attributes != report.attributes {
+        return Err(EnclaveRaContextError::InvalidQeReport);
+    }
+
+    Ok(())
 }
 
 /// Verifies the report
