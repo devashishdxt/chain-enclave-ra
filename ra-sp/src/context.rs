@@ -2,12 +2,13 @@ use std::convert::TryInto;
 
 use aesm_client::{AesmClient, QuoteInfo};
 use hex::FromHex;
+use ra_common::report::AttestationReport;
 use thiserror::Error;
 
 use crate::{
     config::SpRaConfig,
     ias_client::{IasClient, IasClientError},
-    types::{AttestationReport, QuoteResult},
+    types::QuoteResult,
 };
 
 /// Wraps all the SP operations required for remote attestation

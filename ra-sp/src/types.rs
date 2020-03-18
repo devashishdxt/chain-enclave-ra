@@ -1,11 +1,9 @@
 #[cfg(feature = "server")]
 mod attestation_evidence;
-mod attestation_report;
+#[cfg(any(feature = "client", feature = "server"))]
 mod quote_result;
 
 #[cfg(feature = "server")]
 pub use self::attestation_evidence::AttestationEvidence;
-pub use self::{
-    attestation_report::{AttestationReport, AttestationReportBody},
-    quote_result::QuoteResult,
-};
+#[cfg(any(feature = "client", feature = "server"))]
+pub use self::quote_result::QuoteResult;

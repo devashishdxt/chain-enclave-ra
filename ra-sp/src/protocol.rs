@@ -1,6 +1,7 @@
+use ra_common::report::AttestationReport;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{AttestationReport, QuoteResult};
+use crate::types::QuoteResult;
 
 /// Requests sent to SP by enclave
 #[derive(Debug, Serialize, Deserialize)]

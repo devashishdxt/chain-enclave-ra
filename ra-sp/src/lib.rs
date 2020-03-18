@@ -43,13 +43,15 @@ pub mod config;
 pub mod context;
 #[cfg(feature = "server")]
 pub mod ias_client;
+#[cfg(any(feature = "client", feature = "server"))]
 pub mod protocol;
 #[cfg(feature = "server")]
 pub mod server;
+#[cfg(any(feature = "client", feature = "server"))]
 pub mod types;
 
 #[cfg(feature = "client")]
-pub use self::client::SpRaClient;
+pub use self::client::{SpRaClient, SpRaClientError};
 #[cfg(feature = "server")]
 pub use self::{
     config::SpRaConfig,

@@ -15,5 +15,8 @@ sgx-isa = { version = "0.3", features = ["sgxstd"] }
 sha2 = "0.8"
 thiserror = "1.0"
 
+ra-common = { path = "../ra-common" }
+ra-sp = { path = "../ra-sp", features = ["client"] }
+
 [patch.crates-io]
 ring = { git = "https://github.com/devashishdxt/ring.git", branch = "sgx-env" }

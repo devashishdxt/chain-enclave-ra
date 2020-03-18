@@ -1,9 +1,10 @@
 use std::convert::TryInto;
 
+use ra_common::report::{AttestationReport, AttestationReportBody};
 use reqwest::blocking::Client;
 use thiserror::Error;
 
-use crate::types::{AttestationEvidence, AttestationReport, AttestationReportBody};
+use crate::types::AttestationEvidence;
 
 const BASE_URI: &str = "https://api.trustedservices.intel.com/sgx/dev";
 const SIG_RL_PATH: &str = "/attestation/v4/sigrl/";

@@ -1,11 +1,12 @@
 use std::net::{TcpStream, ToSocketAddrs};
 
 use bincode::{deserialize_from, serialize_into};
+use ra_common::report::AttestationReport;
 use thiserror::Error;
 
 use crate::{
     protocol::{Request, Response},
-    types::{AttestationReport, QuoteResult},
+    types::QuoteResult,
 };
 
 /// Client to connect and send requests to SP server for remote attestation

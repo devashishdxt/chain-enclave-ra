@@ -13,12 +13,14 @@ bincode = { version = "1.2", optional = true }
 hex = { version = "0.4", optional = true }
 log = { version = "0.4", optional = true }
 reqwest = { version = "0.10", default-features = false, features = ["blocking", "json", "rustls-tls"], optional = true }
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"], optional = true }
 serde_json = { version = "1.0", optional = true }
 sgx-isa = { version = "0.3", optional = true }
 thiserror = { version = "1.0", optional = true }
 
+ra-common = { path = "../ra-common", optional = true }
+
 [features]
 default = []
-client = ["bincode", "thiserror"]
-server = ["aesm-client", "base64", "bincode", "hex", "log", "reqwest", "serde_json", "sgx-isa", "thiserror"]
+client = ["bincode", "serde", "thiserror", "ra-common"]
+server = ["aesm-client", "base64", "bincode", "hex", "log", "reqwest", "serde", "serde_json", "sgx-isa", "thiserror", "ra-common"]
