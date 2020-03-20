@@ -25,15 +25,6 @@ impl Cmac {
         Self { key: *key }
     }
 
-    /// Obtain the result of MAC computation
-    pub fn sign(&self, data: &[u8]) -> Result<MacCode, CmacError> {
-        let mut inner = InnerCmac::<Aes128>::new_varkey(&self.key[..])
-            .map_err(|_| CmacError::InvalidKeyLength)?;
-        inner.input(data);
-        let mac = inner.result_reset();
-        Ok(mac.code().into())
-    }
-
     /// Checks if the code is correct for data
     pub fn verify(&self, data: &[u8], code: &MacCode) -> Result<(), CmacError> {
         let mut inner = InnerCmac::<Aes128>::new_varkey(&self.key[..])
