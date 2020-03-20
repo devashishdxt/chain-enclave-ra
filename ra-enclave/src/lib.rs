@@ -1,4 +1,4 @@
-mod cmac;
-mod config;
-mod context;
-mod key_pair;
+pub mod certificate;
+pub mod cmac;
+pub mod config;
+pub mod context;

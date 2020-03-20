@@ -25,7 +25,7 @@ impl Quote {
             return None;
         }
 
-        let sig_len = u32::from_le_bytes(&bytes[432..436].try_into().ok?) as usize;
+        let sig_len = u32::from_le_bytes(bytes[432..436].try_into().ok()?) as usize;
 
         if bytes.len() != MIN_QUOTE_LEN + sig_len {
             return None;
@@ -33,7 +33,7 @@ impl Quote {
 
         let body = QuoteBody::try_copy_from(&bytes[0..48])?;
         let report_body = ReportBody::try_copy_from(&bytes[48..432])?;
-        let signature = &bytes[436..(436 + sig_len)].to_vec();
+        let signature = bytes[436..(436 + sig_len)].to_vec();
 
         Some(Self {
             body,

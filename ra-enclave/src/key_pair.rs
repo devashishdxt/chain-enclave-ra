@@ -1,10 +1,12 @@
 use ring::{
-    agreement::{EphemeralPrivateKey, PublicKey, ECDH_P256},
+    pkcs8::Document,
     rand::SystemRandom,
+    signature::{EcdsaKeyPair, KeyPair as _, ECDSA_P256_SHA256_ASN1_SIGNING},
 };
+use rustls::PrivateKey;
 use sha2::{Digest, Sha256};
 
-/// Holds a pair of ECDH (private, public) key based on the NSA Suite B P-256 (secp256r1) curve
+/// Holds a pair of ECDSA (private, public) key based on the NSA Suite B P-256 (secp256r1) curve
 ///
 /// # Note
 ///
@@ -14,28 +16,35 @@ use sha2::{Digest, Sha256};
 /// RA-TLS links the RA-TLS key and enclave by including a hash of the RA-TLS public key as user-data into the Intel SGX
 /// report.
 pub struct KeyPair {
-    private_key: EphemeralPrivateKey,
-    public_key: PublicKey,
+    document: Document,
+    key_pair: EcdsaKeyPair,
 }
 
 impl KeyPair {
     /// Creates a new key pair
     pub fn new() -> Option<Self> {
         let rng = SystemRandom::new();
+        let document = EcdsaKeyPair::generate_pkcs8(&ECDSA_P256_SHA256_ASN1_SIGNING, &rng).ok()?;
+        let key_pair =
+            EcdsaKeyPair::from_pkcs8(&ECDSA_P256_SHA256_ASN1_SIGNING, document.as_ref()).ok()?;
 
-        let private_key = EphemeralPrivateKey::generate(&ECDH_P256, &rng).ok()?;
-        let public_key = private_key.compute_public_key().ok()?;
+        Some(Self { document, key_pair })
+    }
 
-        Some(Self {
-            private_key,
-            public_key,
-        })
+    /// Returns the private key (for use in TLS server configuration)
+    pub fn pkcs8(&self) -> Vec<u8> {
+        self.document.as_ref().to_vec()
+    }
+
+    /// Returns the public key (for use in TLS certificate creation)
+    pub fn public_key(&self) -> &[u8] {
+        self.key_pair.public_key().as_ref()
     }
 
     /// Returns the SHA-256 hash of public key
     pub fn public_key_hash(&self) -> [u8; 32] {
         let mut hasher = Sha256::new();
-        hasher.input(&self.public_key);
+        hasher.input(self.public_key());
         hasher.result().into()
     }
 }
