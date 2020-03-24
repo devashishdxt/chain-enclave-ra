@@ -5,4 +5,6 @@ pub struct SpRaConfig {
     pub ias_key: String,
     /// SPID
     pub spid: String,
+    /// Quote type (possible values: `Linkable` or `Unlinkable`)
+    pub quote_type: String,
 }

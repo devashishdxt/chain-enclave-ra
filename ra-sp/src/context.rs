@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use aesm_client::{AesmClient, QuoteInfo};
+use aesm_client::{AesmClient, QuoteInfo, QuoteType};
 use hex::FromHex;
 use ra_common::report::AttestationReport;
 use thiserror::Error;
@@ -17,6 +17,7 @@ pub struct SpRaContext {
     ias_client: IasClient,
     spid: [u8; 16],
     quote_info: QuoteInfo,
+    quote_type: String,
 }
 
 impl SpRaContext {
@@ -26,6 +27,7 @@ impl SpRaContext {
         let quote_info = aesm_client
             .init_quote()
             .map_err(SpRaContextError::AesmError)?;
+        let quote_type = config.quote_type;
 
         let ias_client = IasClient::new(config.ias_key);
 
@@ -36,6 +38,7 @@ impl SpRaContext {
             ias_client,
             spid,
             quote_info,
+            quote_type,
         })
     }
 
@@ -63,7 +66,7 @@ impl SpRaContext {
     ) -> Result<QuoteResult, SpRaContextError> {
         let quote_result = self
             .aesm_client
-            .get_quote(&self.quote_info, report, self.spid.to_vec(), sig_rl)
+            .get_quote(&self.quote_info, report, self.spid.to_vec(), sig_rl, parse_quote_type(&self.quote_type)?, vec![0; 16])
             .map_err(SpRaContextError::AesmError)?;
 
         let quote = quote_result.quote().to_vec();
@@ -80,6 +83,14 @@ impl SpRaContext {
     }
 }
 
+fn parse_quote_type(quote_type: &str) -> Result<QuoteType, SpRaContextError> {
+    match quote_type {
+        "Linkable" => Ok(QuoteType::Linkable),
+        "Unlinkable" => Ok(QuoteType::Unlinkable),
+        _ => Err(SpRaContextError::InvalidQuoteType)
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum SpRaContextError {
     #[error("AESM error: {0}")]
@@ -88,6 +99,8 @@ pub enum SpRaContextError {
     IasError(#[from] IasClientError),
     #[error("Invalid GID from AESM client: {0}")]
     InvalidGid(#[source] std::array::TryFromSliceError),
+    #[error("Invalid quote type provided in configuration (possible values: `Linkable` or `Unlinkable`)")]
+    InvalidQuoteType,
     #[error("Invalid SPID: {0}")]
     InvalidSpid(#[source] hex::FromHexError),
 }

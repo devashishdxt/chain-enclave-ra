@@ -6,6 +6,7 @@ fn main() {
     let config = SpRaConfig {
         ias_key: "<some key>".to_string(),
         spid: "<some key>".to_string(),
+        quote_type: "Linkable".to_string(),
     };
     let address = "0.0.0.0:8989";
 
