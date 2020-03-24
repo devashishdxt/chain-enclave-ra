@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 ra-enclave = { path = "../ra-enclave" }
+rustls = "0.17"
 
 [patch.crates-io]
 ring = { git = "https://github.com/devashishdxt/ring.git", rev = "c20af342cdbf774a2a35c22cf091ba777f2ef400" }
