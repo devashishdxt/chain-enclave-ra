@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct AttestationReportBody {
     pub id: String,
     pub timestamp: String,
-    pub version: String,
+    pub version: u8,
     pub isv_enclave_quote_status: String,
     pub isv_enclave_quote_body: String,
     pub revocation_reason: Option<u64>,
@@ -23,6 +23,6 @@ pub struct AttestationReportBody {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AttestationReport {
     pub body: AttestationReportBody,
-    pub signature: [u8; 32],
+    pub signature: Vec<u8>,
     pub signing_cert_chain: Vec<u8>,
 }

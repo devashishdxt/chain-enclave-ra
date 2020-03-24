@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use ra_common::report::{AttestationReport, AttestationReportBody};
 use reqwest::blocking::Client;
 use thiserror::Error;
@@ -102,7 +100,7 @@ impl IasClient {
 
         let signature = base64::decode(&encoded_signature)?;
 
-        if signature.len() != 32 {
+        if signature.len() != 256 {
             return Err(IasClientError::InvalidSignatureLen(signature.len()));
         }
 
@@ -119,7 +117,7 @@ impl IasClient {
 
         Ok(AttestationReport {
             body,
-            signature: signature.as_slice().try_into().unwrap(),
+            signature,
             signing_cert_chain,
         })
     }

@@ -1,0 +1,1 @@
+cd sample-ra-sp && RUST_LOG=debug cargo run
