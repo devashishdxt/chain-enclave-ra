@@ -66,7 +66,14 @@ impl SpRaContext {
     ) -> Result<QuoteResult, SpRaContextError> {
         let quote_result = self
             .aesm_client
-            .get_quote(&self.quote_info, report, self.spid.to_vec(), sig_rl, parse_quote_type(&self.quote_type)?, vec![0; 16])
+            .get_quote(
+                &self.quote_info,
+                report,
+                self.spid.to_vec(),
+                sig_rl,
+                parse_quote_type(&self.quote_type)?,
+                vec![0; 16],
+            )
             .map_err(SpRaContextError::AesmError)?;
 
         let quote = quote_result.quote().to_vec();
@@ -87,7 +94,7 @@ fn parse_quote_type(quote_type: &str) -> Result<QuoteType, SpRaContextError> {
     match quote_type {
         "Linkable" => Ok(QuoteType::Linkable),
         "Unlinkable" => Ok(QuoteType::Unlinkable),
-        _ => Err(SpRaContextError::InvalidQuoteType)
+        _ => Err(SpRaContextError::InvalidQuoteType),
     }
 }
 

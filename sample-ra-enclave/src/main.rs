@@ -19,10 +19,11 @@ fn main() {
     let certificate = context.get_certificate().unwrap();
     let tls_server_config: Arc<ServerConfig> = Arc::new(certificate.try_into().unwrap());
 
-    eprintln!("Successfully created certificate!");
-    eprintln!("Starting TLS Server");
+    log::info!("Successfully created certificate!");
 
     let addrs = "0.0.0.0:9090";
+    log::info!("Starting TLS Server at: {}", addrs);
+
     let listener = TcpListener::bind(addrs).unwrap();
 
     for stream in listener.incoming() {

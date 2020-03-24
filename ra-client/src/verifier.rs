@@ -35,6 +35,7 @@ impl ServerCertVerifier for EnclaveCertVerifier {
     }
 }
 
+/// Verifies certificate
 fn verify_cert(certificate: &[u8]) -> Result<(), EnclaveCertVerifierError> {
     let (_, certificate) = parse_x509_der(certificate)
         .map_err(|_| EnclaveCertVerifierError::CertificateParsingError)?;
