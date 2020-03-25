@@ -8,6 +8,7 @@ use rustls::{
     internal::pemfile::certs, Certificate, ClientConfig, RootCertStore, ServerCertVerified,
     ServerCertVerifier, TLSError,
 };
+use sha2::{Digest, Sha256};
 use thiserror::Error;
 use webpki::{
     DNSNameRef, EndEntityCert, SignatureAlgorithm, TLSServerTrustAnchors, Time, TrustAnchor,
@@ -66,10 +67,18 @@ impl EnclaveCertVerifier {
         let attestation_report_oid = Oid::from(OID_EXTENSION_ATTESTATION_REPORT);
         let mut attestation_report_received = false;
 
+        let public_key_hash = sha256(
+            certificate
+                .tbs_certificate
+                .subject_pki
+                .subject_public_key
+                .data
+        );
+
         for extension in certificate.tbs_certificate.extensions {
             if extension.oid == attestation_report_oid {
                 attestation_report_received = true;
-                self.verify_attestation_report(extension.value)?;
+                self.verify_attestation_report(extension.value, public_key_hash)?;
             }
         }
 
@@ -84,6 +93,7 @@ impl EnclaveCertVerifier {
     fn verify_attestation_report(
         &self,
         attestation_report: &[u8],
+        public_key_hash: [u8; 32],
     ) -> Result<(), EnclaveCertVerifierError> {
         log::info!("Verifying attestation report");
 
@@ -118,7 +128,7 @@ impl EnclaveCertVerifier {
             )?;
         }
 
-        self.verify_attestation_report_body(&attestation_report.body)?;
+        self.verify_attestation_report_body(&attestation_report.body, public_key_hash)?;
 
         log::info!("Attestation report is valid!");
         Ok(())
@@ -127,6 +137,7 @@ impl EnclaveCertVerifier {
     fn verify_attestation_report_body(
         &self,
         attestation_report_body: &[u8],
+        public_key_hash: [u8; 32],
     ) -> Result<(), EnclaveCertVerifierError> {
         let attestation_report_body: AttestationReportBody =
             serde_json::from_slice(attestation_report_body)?;
@@ -141,6 +152,10 @@ impl EnclaveCertVerifier {
         }
 
         let quote = attestation_report_body.get_quote()?;
+
+        if &quote.report_body.report_data[..32] != &public_key_hash {
+            return Err(EnclaveCertVerifierError::PublicKeyHashMismatch);
+        }
 
         Ok(())
     }
@@ -176,6 +191,12 @@ impl From<EnclaveCertVerifier> for ClientConfig {
     }
 }
 
+fn sha256(input: &[u8]) -> [u8; 32] {
+    let mut hasher = Sha256::new();
+    hasher.input(input);
+    hasher.result().into()
+}
+
 #[derive(Debug, Error)]
 pub enum EnclaveCertVerifierError {
     #[error("Bincode error: {0}")]
@@ -192,6 +213,8 @@ pub enum EnclaveCertVerifierError {
     JsonError(#[from] serde_json::Error),
     #[error("Attestation report not available in server certificate")]
     MissingAttestationReport,
+    #[error("Hash of public key in certificate does not match with the one in enclave quote")]
+    PublicKeyHashMismatch,
     #[error("Unable to parse quote from attestation report body: {0}")]
     QuoteParsingError(#[from] ra_common::report::QuoteParsingError),
     #[error("Unable to get current time")]

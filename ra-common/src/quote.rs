@@ -10,9 +10,9 @@ const QUOTE_LEN: usize = 432;
 #[derive(Debug)]
 pub struct Quote {
     /// Body of the quote
-    body: QuoteBody,
+    pub body: QuoteBody,
     /// Report body of the quote
-    report_body: ReportBody,
+    pub report_body: ReportBody,
 }
 
 impl Quote {
