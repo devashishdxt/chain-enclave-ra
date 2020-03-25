@@ -11,5 +11,8 @@ ftxsgx-elf2sgxs $TARGET --heap-size 0x2000000 --stack-size 0x20000 --threads 8 \
     --debug --output $TARGET_SGX && \
 sgxs-sign --key $KEY $TARGET_SGX $TARGET_SIG -d --xfrm 7/0 --isvprodid 0 --isvsvn 0
 
-# Build client
+# Build SP
 (cd sample-ra-sp && cargo build)
+
+# Build Client
+(cd sample-ra-client && cargo build)

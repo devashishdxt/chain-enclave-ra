@@ -1,5 +1,5 @@
 [package]
-name = "sample-ra-sp"
+name = "sample-ra-client"
 version = "0.1.0"
 authors = ["Devashish Dixit <devashishdxt@gmail.com>"]
 edition = "2018"
@@ -8,5 +8,7 @@ edition = "2018"
 
 [dependencies]
 env_logger = "0.7"
+rustls = "0.17"
+webpki = "0.21"
 
-ra-sp = { path = "../ra-sp", features = ["server"] }
+ra-client = { path = "../ra-client" }

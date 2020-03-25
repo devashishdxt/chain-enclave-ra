@@ -1,4 +1,4 @@
-use ra_common::report::{AttestationReport, AttestationReportBody};
+use ra_common::report::AttestationReport;
 use reqwest::blocking::Client;
 use thiserror::Error;
 
@@ -104,8 +104,8 @@ impl IasClient {
             return Err(IasClientError::InvalidSignatureLen(signature.len()));
         }
 
-        // Extract signing certificate chain
-        let signing_cert_chain = response
+        // Extract signing certificate
+        let signing_cert = response
             .headers()
             .get("X-IASReport-Signing-Certificate")
             .ok_or_else(|| IasClientError::MissingSignature)?
@@ -113,12 +113,12 @@ impl IasClient {
             .to_vec();
 
         // Parse attestation verification report body
-        let body: AttestationReportBody = response.json()?;
+        let body = response.bytes()?.to_vec();
 
         Ok(AttestationReport {
             body,
             signature,
-            signing_cert_chain,
+            signing_cert,
         })
     }
 }

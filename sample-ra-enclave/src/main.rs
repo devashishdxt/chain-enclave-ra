@@ -10,6 +10,10 @@ use ra_enclave::{EnclaveRaConfig, EnclaveRaContext};
 use rustls::{ServerConfig, ServerSession, StreamOwned};
 
 fn main() {
+    std::env::set_var("RUST_LOG", "debug");
+
+    env_logger::init();
+
     let config = EnclaveRaConfig {
         sp_addr: "0.0.0.0:8989".to_string(),
         certificate_validity_secs: 86400,
@@ -38,6 +42,7 @@ fn main() {
     }
 }
 
-fn handle_connection<T: Read + Write>(_stream: T) {
-    // Do nothing
+fn handle_connection<T: Read + Write>(mut stream: T) {
+    log::info!("Sending sample data!");
+    stream.write(&[1u8; 5][..]).unwrap();
 }

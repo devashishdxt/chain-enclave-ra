@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use bincode::serialize;
 use chrono::{Duration, Utc};
-use ra_common::report::AttestationReport;
+use ra_common::report::{AttestationReport, OID_EXTENSION_ATTESTATION_REPORT};
 use ra_sp::{SpRaClient, SpRaClientError};
 use rcgen::{
     Certificate as RcGenCertificate, CertificateParams, CustomExtension, DistinguishedName, DnType,
@@ -18,8 +18,6 @@ use crate::{
     cmac::{Cmac, CmacError},
     config::EnclaveRaConfig,
 };
-
-static OID_EXTENSION: &[u64] = &[2, 16, 840, 1, 113_730, 1, 13];
 
 /// Wraps all the in-enclave operations required for remote attestation
 pub struct EnclaveRaContext {
@@ -162,7 +160,7 @@ impl EnclaveRaContext {
 
         let attestation_report = self.get_attestation_report(sha256(key_pair.public_key_raw()))?;
         certificate_params.custom_extensions = vec![CustomExtension::from_oid_content(
-            OID_EXTENSION,
+            OID_EXTENSION_ATTESTATION_REPORT,
             serialize(&attestation_report)?,
         )];
 

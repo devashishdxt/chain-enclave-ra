@@ -37,7 +37,7 @@ impl QuoteBody {
         };
 
         // off 0, size 2
-        let version = u16::from_le_bytes(take(16)?.try_into().ok()?);
+        let version = u16::from_le_bytes(take(2)?.try_into().ok()?);
 
         // off 2, size 2
         let sig_type = u16::from_le_bytes(take(2)?.try_into().ok()?);
